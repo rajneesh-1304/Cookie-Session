@@ -1,27 +1,33 @@
-import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';  
-
-import { LocalAuthGuard } from './local.guard';
+import { Controller, Get, Post, Req, UseGuards, Res } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { Public } from 'src/decorators/public.decorator';
+import { Response } from 'express';
 
-@Controller('auth')  
-export class AuthController {  
-    constructor(private authService: AuthService) {}
-//   @UseGuards(LocalAuthGuard)  
-  @Post('login')  
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) { }
+
   @Public()
-  @UseGuards(LocalAuthGuard)
-  login(@Req() req: Request): any {  
-    return this.authService.signIn(req); 
-  }  
-
-  @Get()
-  getall(){
-    return 'hello';
+  @UseGuards(AuthGuard('local'))
+  @Post('login')
+  login(@Req() req, @Res({ passthrough: true }) res: Response) {
+    return this.authService.signIn(req.user, res);
   }
-//   @Post('logout')  
-//   logout(@Request() req): any {  
-//     req.session.destroy();  
-//     return { message: 'Logout successful' };  
-//   }  
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('getall')
+  getall(@Req() req) {
+    return {
+      message: 'Access granted',
+      user: req.user,
+    };
+  }
+
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('access_token');
+    return { message: 'Logged out successfully' };
+  }
+
 }

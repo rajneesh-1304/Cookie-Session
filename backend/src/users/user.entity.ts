@@ -1,9 +1,5 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-export enum UserRole {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-}
 
 @Entity('users')
 export class User {

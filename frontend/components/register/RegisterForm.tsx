@@ -78,6 +78,7 @@ export default function RegisterForm() {
       const registerData = {
         displayName: user.displayName,
         email: user.email,
+        password: 'Pass@123'
       };
 
       const registerResponse = await dispatch(registerThunk(registerData));
@@ -114,6 +115,7 @@ export default function RegisterForm() {
       const dat = {
         displayName: data.name,
         email: data.email,
+        password: data.password
       }
       await dispatch(registerThunk(dat)).unwrap();
       setSnackbarMessage('User created successfully!');

@@ -1,37 +1,50 @@
-import { ForbiddenException,Req, Injectable, NotFoundException } from "@nestjs/common";
-import { User } from "src/users/user.entity";
-import { DataSource } from "typeorm";
+import { Injectable, ForbiddenException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { DataSource } from 'typeorm';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly dataSource: DataSource) { }
-    async login(email, password) {
-        const userRepo = this.dataSource.getRepository(User);
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly jwtService: JwtService,
+  ) {}
 
-        const user = await userRepo.findOne({
-            where: { email },
-        });
-        if (!user) {
-            throw new NotFoundException('User not found');
-        }
+  async validateUser(email: string, password: string) {
+    const userRepo = this.dataSource.getRepository(User);
+    console.log(email, password)
+    const user = await userRepo.findOne({ where: { email } });
 
-        if(user.password !== password){
-            throw new ForbiddenException('PassWord is incorrect');
-        }
 
-        if (user) {
-            return {
-                message: 'User logged in successfully',
-                user: {
-                    id: user.id,
-                    email: user.email,
-                },
-            };
-        }
-        return null;
+    if (!user || user.password !== password) {
+      return null;
     }
 
-    async signIn(@Req() req: Request): Promise<User> {
-    return req['user'] as User;
+    if (user.isBanned) {
+      throw new ForbiddenException('User is banned');
+    }
+
+    return user;
   }
+
+  signIn(user: User, res) {
+  const payload = { sub: user.id, email: user.email };
+  const token = this.jwtService.sign(payload);
+
+  res.cookie('access_token', token, {
+    httpOnly: true,
+    maxAge: 15 * 60 * 1000, 
+    sameSite: 'lax',
+    secure: false, 
+  });
+
+  return {
+    message: 'Login successful',
+    user: {
+      id: user.id,
+      email: user.email,
+    },
+  };
+}
+
 }

@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { deleteUserr, fetchUsers, loginUser, registerUser } from "./service";
-import { deleteUser } from "firebase/auth";
+import { fetchUsers, loginUser, registerUser } from "./service";
 
 interface User {
   id: number;
@@ -37,13 +36,11 @@ export const registerThunk = createAsyncThunk(
 export const fetchUsersThunk = createAsyncThunk(
   'users/fetchAll',
   async (
-    { page, limit }: any,
-    { rejectWithValue }
   ) => {
     try {
-      return await fetchUsers({ page, limit, });
+      return await fetchUsers();
     } catch (err: any) {
-      return rejectWithValue(err?.message || 'Failed to fetch questions');
+      return err;
     }
   }
 );
@@ -59,16 +56,27 @@ export const loginThunk = createAsyncThunk(
   }
 );
 
-export const deleteUserThunk = createAsyncThunk(
-  'auth/delete',
-  async (id: any, { rejectWithValue })=> {
-    try {
-      return await deleteUserr(id);
-    } catch (err: any) {
-      return rejectWithValue(err.response.data.message);
-    }
-  }
-)
+// export const deleteUserThunk = createAsyncThunk(
+//   'auth/delete',
+//   async (id: any, { rejectWithValue }) => {
+//     try {
+//       return await deleteUserr(id);
+//     } catch (err: any) {
+//       return rejectWithValue(err.response.data.message);
+//     }
+//   }
+// )
+
+// export const logoutThunk = createAsyncThunk(
+//   'auth/logout',
+//   async (_, { rejectWithValue }) => {
+//     try {
+//       return await logoutUser();
+//     } catch (err: any) {
+//       return rejectWithValue(err?.response?.data?.message || 'Logout failed');
+//     }
+//   }
+// );
 
 
 const usersSlice = createSlice({
@@ -90,12 +98,12 @@ const usersSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchUsersThunk.fulfilled, (state, action) => {
-        const { user, page } = action.payload;
-        if(page === '1'){
-          state.users=user;
-        }else{
-          state.users = [...state.users, ...user];
-        }
+        // const { user, page } = action.payload;
+        // if (page === '1') {
+        //   state.users = user;
+        // } else {
+        //   state.users = [...state.users, ...user];
+        // }
         state.loading = false;
       })
       .addCase(registerThunk.pending, (state) => {
@@ -119,8 +127,20 @@ const usersSlice = createSlice({
       .addCase(loginThunk.rejected, (state, action) => {
         // state.loading = false;
         state.error = String(action.payload) || "Login failed";
-      });
-
+      })
+      // .addCase(logoutThunk.pending, (state) => {
+      //   state.loading = true;
+      // })
+      // .addCase(logoutThunk.fulfilled, (state) => {
+      //   state.currentUser = null;
+      //   state.users = [];
+      //   state.loading = false;
+      //   state.error = null;
+      // })
+      // .addCase(logoutThunk.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error = String(action.payload);
+      // });
   },
 });
 

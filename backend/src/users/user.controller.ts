@@ -1,44 +1,31 @@
-import { Controller, Get, Post, Body, Delete, Patch, Param, Query, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Public } from 'src/decorators/public.decorator';
 import { UserService } from './user.service';
 import { UsersDefinition } from './DTO/user';
-import { LoginUserDto } from './DTO/login';
-import { AuthGuard } from '@nestjs/passport';  
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
-  
-  @UseGuards(AuthGuard('local'))
-  @Post('login')  
-  login(@Request() req): any {  
-    req.session.user = req.user;  
-    return { message: 'Login successful' };  
-  }  
+  constructor(private readonly userService: UserService) {}
 
-  @Post('logout')  
-  logout(@Request() req): any {  
-    req.session.destroy();  
-    return { message: 'Logout successful' };  
-  }  
-
+  @Public()
   @Post('register')
   registerUser(@Body() userData: UsersDefinition) {
     return this.userService.register(userData);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch('delete/:id')
-  deleteQuestion(
-    @Param('id') id: any,
-  ) {
+  deleteQuestion(@Param('id') id: any) {
     return this.userService.banUser(+id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   getAll(
     @Query('page') page = 1,
     @Query('limit') limit = 10,
   ) {
-    return this.userService.getAll({page, limit});
-}
-
+    return this.userService.getAll({ page, limit });
+  }
 }

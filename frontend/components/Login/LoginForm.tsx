@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Password, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -73,7 +73,8 @@ export default function LoginForm() {
       }
 
       const loginData = {
-        email: user.email
+        email: user.email,
+        password: 'Pass@123'
       }
 
       const loginResponse = await dispatch(loginThunk( loginData));
@@ -81,7 +82,7 @@ export default function LoginForm() {
       if (loginThunk.fulfilled.match(loginResponse)) {
         setSnackbarMessage("Login successful!");
         setSnackbarOpen(true);
-        router.push('/question')
+        router.push('/')
       } 
     } catch (error) {
       await signOut(auth);
@@ -96,14 +97,15 @@ export default function LoginForm() {
       const response = await signInWithEmailAndPassword(auth, data.email, data.password);
 
       const loginData = {
-        email: data.email
+        email: data.email,
+        password: data.password
       }
       const loginResponse = await dispatch(loginThunk(loginData));
 
       if (loginThunk.fulfilled.match(loginResponse)) {
         setSnackbarMessage("Login successful!");
         setSnackbarOpen(true);
-        setTimeout(() => router.push('/question'), 1200);
+        setTimeout(() => router.push('/'), 1200);
       } else {
         await signOut(auth);
         setSnackbarMessage(err);
@@ -111,7 +113,7 @@ export default function LoginForm() {
       }
 
     } catch (error: any) {
-  setSnackbarMessage(error);
+  setSnackbarMessage(error.message);
   setSnackbarOpen(true);
 }
 
