@@ -113,7 +113,7 @@ export default function LoginForm() {
       }
 
     } catch (error: any) {
-  setSnackbarMessage(error.message);
+  setSnackbarMessage(`${error.message ? error.message : error}`);
   setSnackbarOpen(true);
 }
 

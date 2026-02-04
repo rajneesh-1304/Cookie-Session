@@ -16,6 +16,7 @@ import searchReducer from './features/search/searchSlice'
 import questionReducer from './features/questions/questionSlice'
 import answerReducer from './features/answers/answerSlice';
 import tagsReducer from './features/tags/tagSlice'
+import { injectStore } from "@/components/privateApi";
 
 const persistConfig = {
   key: "root",
@@ -42,6 +43,8 @@ export const store = configureStore({
       },
     }),
 });
+
+injectStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

@@ -22,7 +22,7 @@ export default function LoginLayout({
     }
 
     if (currentUser) {
-      router.replace('/question');
+      router.replace('/');
     }
   }, [currentUser, router]);
 

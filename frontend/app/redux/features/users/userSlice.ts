@@ -34,13 +34,13 @@ export const registerThunk = createAsyncThunk(
 );
 
 export const fetchUsersThunk = createAsyncThunk(
-  'users/fetchAll',
-  async (
-  ) => {
+  "users/fetchAll",
+  async (_, { rejectWithValue }) => {
     try {
-      return await fetchUsers();
-    } catch (err: any) {
-      return err;
+      const response = await fetchUsers();
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to fetch");
     }
   }
 );
@@ -56,27 +56,7 @@ export const loginThunk = createAsyncThunk(
   }
 );
 
-// export const deleteUserThunk = createAsyncThunk(
-//   'auth/delete',
-//   async (id: any, { rejectWithValue }) => {
-//     try {
-//       return await deleteUserr(id);
-//     } catch (err: any) {
-//       return rejectWithValue(err.response.data.message);
-//     }
-//   }
-// )
 
-// export const logoutThunk = createAsyncThunk(
-//   'auth/logout',
-//   async (_, { rejectWithValue }) => {
-//     try {
-//       return await logoutUser();
-//     } catch (err: any) {
-//       return rejectWithValue(err?.response?.data?.message || 'Logout failed');
-//     }
-//   }
-// );
 
 
 const usersSlice = createSlice({
@@ -128,19 +108,6 @@ const usersSlice = createSlice({
         // state.loading = false;
         state.error = String(action.payload) || "Login failed";
       })
-      // .addCase(logoutThunk.pending, (state) => {
-      //   state.loading = true;
-      // })
-      // .addCase(logoutThunk.fulfilled, (state) => {
-      //   state.currentUser = null;
-      //   state.users = [];
-      //   state.loading = false;
-      //   state.error = null;
-      // })
-      // .addCase(logoutThunk.rejected, (state, action) => {
-      //   state.loading = false;
-      //   state.error = String(action.payload);
-      // });
   },
 });
 
